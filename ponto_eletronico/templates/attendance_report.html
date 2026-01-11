@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Espelho de Ponto - Ponto Eletrônico{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Espelho de Ponto</h1>
+                    <p class="text-gray-600 mt-1">Consulte seu histórico de frequência, horas trabalhadas e ocorrências
+                        mensais</p>
+                </div>
+                <div>
+                    <a href="{% url 'logout' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Navigation -->
+        <nav class="bg-white rounded-lg shadow mb-8 p-4 flex gap-4">
+            <a href="{% url 'dashboard' %}" class="px-4 py-2 rounded-lg hover:bg-gray-100">
+                Dashboard
+            </a>
+            <button class="px-4 py-2 rounded-lg bg-gray-100 font-semibold">
+                Meu Ponto
+            </button>
+        </nav>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <div class="flex gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mês</label>
+                    <select id="month-select" onchange="filterByMonth()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg">
+                        {% for m, name in months_dict.items %}
+                        <option value="{{ m }}" {% if m==month %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ano</label>
+                    <select id="year-select" onchange="filterByYear()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg">
+                        {% for y in years %}
+                        <option value="{{ y }}" {% if y==year %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <span class="material-icons text-4xl text-blue-600 mr-4">schedule</span>
+                    <div>
+                        <p class="text-gray-600 text-sm">HORAS TRABALHADAS</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ total_hours|floatformat:2 }}h</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <span class="material-icons text-4xl text-red-600 mr-4">block</span>
+                    <div>
+                        <p class="text-gray-600 text-sm">AUSÊNCIAS</p>
+                        <p class="text-2xl font-bold text-red-600">{{ total_absences }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <span class="material-icons text-4xl text-yellow-600 mr-4">warning</span>
+                    <div>
+                        <p class="text-gray-600 text-sm">INCONSISTÊNCIAS</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ total_inconsistencies }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Entrada</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Início Intervalo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fim
+                            Intervalo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saída
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
+                            de Horas</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for day in all_days %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ day.date|date:"d/m/Y" }}
+                            {% if day.date|date:"w" == "0" or day.date|date:"w" == "6" %}
+                            <span class="ml-2 text-xs text-gray-500">(fim semana)</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ day.records.ENTRADA|default:"--:--" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ day.records.INICIO_INTERVALO|default:"--:--" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ day.records.FIM_INTERVALO|default:"--:--" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ day.records.SAIDA|default:"--:--" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                            {% if day.attendance %}
+                            {% if day.attendance.status == "AUSENTE" %}
+                            00:00
+                            {% else %}
+                            {{ day.attendance.total_horas|floatformat:2 }}
+                            {% endif %}
+                            {% else %}
+                            00:00
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {% if day.attendance %}
+                            {% if day.attendance.status == "NORMAL" %}
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">
+                                ✓ Normal
+                            </span>
+                            {% elif day.attendance.status == "AUSENTE" %}
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">
+                                ✗ Falta
+                            </span>
+                            {% elif day.attendance.status == "INCONSISTENTE" %}
+                            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">
+                                ⚠ Inconsistente
+                            </span>
+                            {% endif %}
+                            {% else %}
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">
+                                ✗ Falta
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            Nenhum registro para este período
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="bg-white rounded-lg shadow p-6 mt-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Totais do Período</h3>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="border-l-4 border-blue-600 pl-4">
+                    <p class="text-gray-600 text-sm">Total Acumulado</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ total_hours|floatformat:2 }}h</p>
+                </div>
+                <div class="border-l-4 border-red-600 pl-4">
+                    <p class="text-gray-600 text-sm">Total de Faltas</p>
+                    <p class="text-3xl font-bold text-red-600">{{ total_absences }}</p>
+                </div>
+                <div class="border-l-4 border-yellow-600 pl-4">
+                    <p class="text-gray-600 text-sm">Inconsistências</p>
+                    <p class="text-3xl font-bold text-yellow-600">{{ total_inconsistencies }}</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function filterByMonth() {
+        const month = document.getElementById('month-select').value;
+        const year = document.getElementById('year-select').value;
+        window.location.href = `?month=${month}&year=${year}`;
+    }
+
+    function filterByYear() {
+        const month = document.getElementById('month-select').value;
+        const year = document.getElementById('year-select').value;
+        window.location.href = `?month=${month}&year=${year}`;
+    }
+</script>
+{% endblock %}

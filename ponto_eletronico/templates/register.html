@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro - Ponto Eletrônico{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Cadastro</h1>
+                <p class="text-gray-600 mt-2">Crie sua conta no sistema</p>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label for="{{ form.cpf.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        CPF
+                    </label>
+                    <input type="text" name="cpf" id="{{ form.cpf.id_for_label }}" placeholder="11 dígitos"
+                        maxlength="11"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                    {% if form.cpf.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.cpf.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Nome
+                        </label>
+                        <input type="text" name="first_name" id="{{ form.first_name.id_for_label }}"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                        {% if form.first_name.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Sobrenome
+                        </label>
+                        <input type="text" name="last_name" id="{{ form.last_name.id_for_label }}"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                        {% if form.last_name.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        E-mail
+                    </label>
+                    <input type="email" name="email" id="{{ form.email.id_for_label }}"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.matricula.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Matrícula
+                    </label>
+                    <input type="text" name="matricula" id="{{ form.matricula.id_for_label }}"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                    {% if form.matricula.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.matricula.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Senha
+                    </label>
+                    <input type="password" name="password1" id="{{ form.password1.id_for_label }}"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                    {% if form.password1.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Confirme a Senha
+                    </label>
+                    <input type="password" name="password2" id="{{ form.password2.id_for_label }}"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                    {% if form.password2.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                    Criar Conta
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Já tem uma conta?
+                    <a href="{% url 'login' %}" class="text-blue-600 font-semibold hover:text-blue-700">
+                        Faça login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

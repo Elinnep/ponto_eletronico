@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Ponto Eletrônico{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Olá, {{ user.first_name }}</h1>
+                    <p class="text-gray-600 mt-1">
+                        <span id="current-day-name"></span>, <span id="current-date"></span>
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'logout' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Navigation -->
+        <nav class="bg-white rounded-lg shadow mb-8 p-4 flex gap-4">
+            <button onclick="switchTab('dashboard')" class="tab-btn active px-4 py-2 rounded-lg" data-tab="dashboard">
+                Dashboard
+            </button>
+            <a href="{% url 'attendance_report' %}" class="px-4 py-2 rounded-lg hover:bg-gray-100">
+                Meu Ponto
+            </a>
+        </nav>
+
+        <!-- Current Time Section -->
+        <div class="bg-white rounded-lg shadow p-8 mb-8">
+            <div class="text-center">
+                <p class="text-gray-600 mb-2">HORÁRIO ATUAL</p>
+                <div class="text-6xl font-bold text-blue-600 font-mono" id="current-time">
+                    00:00:00
+                </div>
+                <p class="text-gray-500 mt-4">Tempo Real (GMT-3)</p>
+            </div>
+        </div>
+
+        <!-- Registration Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <button onclick="registerTime('ENTRADA')"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-4 rounded-lg shadow transition">
+                <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M12 2a1 1 0 011 1v6.414l1.293-1.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L11 9.414V3a1 1 0 011-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                ENTRADA
+            </button>
+
+            <button onclick="registerTime('INICIO_INTERVALO')"
+                class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-6 px-4 rounded-lg shadow transition">
+                <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M6 5a1 1 0 011-1h1V3a1 1 0 011-1h4a1 1 0 011 1v1h1a1 1 0 011 1v1a1 1 0 01-1 1H6a1 1 0 01-1-1V5zm13 3a1 1 0 00-1-1h-1V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v2H3a1 1 0 00-1 1v2a1 1 0 001 1h1v5a2 2 0 002 2h10a2 2 0 002-2v-5h1a1 1 0 001-1V8z">
+                    </path>
+                </svg>
+                INTERVALO
+            </button>
+
+            <button onclick="registerTime('FIM_INTERVALO')"
+                class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 px-4 rounded-lg shadow transition">
+                <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M12 18a6 6 0 100-12 6 6 0 000 12z"></path>
+                </svg>
+                FIM INTERVALO
+            </button>
+
+            <button onclick="registerTime('SAIDA')"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-4 rounded-lg shadow transition">
+                <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd">
+                    </path>
+                </svg>
+                SAÍDA
+            </button>
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Resumo do Dia</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="border-l-4 border-green-600 pl-4 py-2">
+                    <p class="text-gray-600 text-sm">ENTRADA</p>
+                    <p class="text-2xl font-bold text-green-600">
+                        {{ records_data.ENTRADA|default:"--:--" }}
+                    </p>
+                </div>
+                <div class="border-l-4 border-yellow-600 pl-4 py-2">
+                    <p class="text-gray-600 text-sm">INÍCIO INTERVALO</p>
+                    <p class="text-2xl font-bold text-yellow-600">
+                        {{ records_data.INICIO_INTERVALO|default:"--:--" }}
+                    </p>
+                </div>
+                <div class="border-l-4 border-orange-600 pl-4 py-2">
+                    <p class="text-gray-600 text-sm">FIM INTERVALO</p>
+                    <p class="text-2xl font-bold text-orange-600">
+                        {{ records_data.FIM_INTERVALO|default:"--:--" }}
+                    </p>
+                </div>
+                <div class="border-l-4 border-red-600 pl-4 py-2">
+                    <p class="text-gray-600 text-sm">SAÍDA</p>
+                    <p class="text-2xl font-bold text-red-600">
+                        {{ records_data.SAIDA|default:"--:--" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Atividades Recentes</h2>
+            {% if records_today %}
+            <div class="space-y-2">
+                {% for record in records_today %}
+                <div class="flex justify-between items-center py-3 border-b">
+                    <span class="text-gray-700">{{ record.get_tipo_display }}</span>
+                    <span class="font-mono text-gray-900">{{ record.hora|time:"H:i" }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-600">Nenhum registro até o momento</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<!-- Hidden Modal for Messages -->
+<div id="message-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+        <div id="modal-icon" class="text-center mb-4 text-4xl"></div>
+        <p id="modal-message" class="text-center text-gray-700 font-semibold mb-4"></p>
+        <button onclick="document.getElementById('message-modal').classList.add('hidden')"
+            class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            OK
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update current time every second
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+
+        // Update date
+        const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        const dayName = dayNames[now.getDay()];
+        const date = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        document.getElementById('current-day-name').textContent = dayName;
+        document.getElementById('current-date').textContent = `${date}/${month}/${year}`;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Register time
+    function registerTime(type) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+
+        fetch('{% url "register_time" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ type: type })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const modal = document.getElementById('message-modal');
+                const modalMessage = document.getElementById('modal-message');
+                const modalIcon = document.getElementById('modal-icon');
+
+                if (data.success) {
+                    modalIcon.textContent = '✓';
+                    modalIcon.className = 'text-center mb-4 text-4xl text-green-600';
+                    modalMessage.textContent = data.message;
+                    // Reload after 2 seconds
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    modalIcon.textContent = '✗';
+                    modalIcon.className = 'text-center mb-4 text-4xl text-red-600';
+                    modalMessage.textContent = data.error;
+                }
+                modal.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao registrar ponto. Tente novamente.');
+            });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
