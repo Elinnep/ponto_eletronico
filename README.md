@@ -1,5 +1,58 @@
 # Sistema de Controle de Frequência e Ponto Eletrônico
 
+## 🚀 Quick Start - Como Rodar o Projeto
+
+### Pré-requisitos
+- Python 3.8+
+- Git
+
+### 1. Clonar o Repositório
+```bash
+git clone https://github.com/Elinnep/ponto_eletronico.git
+cd ponto_eletronico
+```
+
+### 2. Criar e Ativar o Ambiente Virtual
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Instalar Dependências
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Executar Migrações
+```bash
+cd ponto_eletronico
+python manage.py migrate
+```
+
+### 5. Criar Superusuário (Admin)
+```bash
+python manage.py createsuperuser
+```
+Siga as instruções para criar um usuário administrador.
+
+**Ou use o usuário de teste (credenciais sensíveis a maiúsculas):**
+- CPF: `12345678901`
+- Senha: `Admin@123`
+
+### 6. Iniciar o Servidor
+```bash
+python manage.py runserver
+```
+
+O sistema estará disponível em: **http://127.0.0.1:8000**
+
+---
+
 ## 1. Introdução
 
 Este documento descreve a idealização e especificação do sistema **Controle de Frequência e Ponto Eletrônico**, desenvolvido como parte da avaliação prática da disciplina de Desenvolvimento Web II.
@@ -215,4 +268,4 @@ A implementação pode ser expandida futuramente para múltiplos perfis de usuá
 
 **Credenciais de teste já criadas:**
 - CPF: `12345678901`
-- Senha: `admin123`
+- Senha: `Admin@123`
