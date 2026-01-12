@@ -13,6 +13,7 @@ staticfiles/
 env/
 venv/
 .venv/
+venv
 
 # --- IDE / Editores  ---
 .vscode/
